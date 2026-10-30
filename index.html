@@ -1,1 +1,320 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyLoginWebsite</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      width: 100%;
+      max-width: 400px;
+      padding: 32px;
+      border-radius: 18px;
+      box-shadow: 0 12px 40px #00000015;
+    }
+
+    h1 { text-align: center; color: #1e40af; }
+    p { color: #64748b; text-align: center; }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      margin: 9px 0;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover { background: #1d4ed8; }
+    button:disabled { opacity: .6; cursor: wait; }
+
+    .secondary {
+      background: #475569;
+    }
+
+    .link {
+      display: block;
+      text-align: center;
+      color: #2563eb;
+      cursor: pointer;
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+    .hidden { display: none; }
+
+    #message {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .dashboard { text-align: center; }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>My Account</h1>
+  <p>Welcome to MyLoginWebsite</p>
+
+  <div id="authArea">
+    <div id="loginView">
+      <h3>Login</h3>
+      <form id="loginForm">
+        <input id="loginEmail" type="email"
+          placeholder="Email address" autocomplete="email" required>
+
+        <input id="loginPassword" type="password"
+          placeholder="Password" autocomplete="current-password" required>
+
+        <button type="submit">Login</button>
+      </form>
+
+      <span class="link" id="forgotLink">Forgot password?</span>
+      <span class="link" id="showSignup">Create a new account</span>
+    </div>
+
+    <div id="signupView" class="hidden">
+      <h3>Create Account</h3>
+      <form id="signupForm">
+        <input id="signupEmail" type="email"
+          placeholder="Email address" autocomplete="email" required>
+
+        <input id="signupPassword" type="password"
+          placeholder="Create password" minlength="8"
+          autocomplete="new-password" required>
+
+        <button type="submit">Sign Up</button>
+      </form>
+
+      <span class="link" id="showLogin">Already have an account? Login</span>
+    </div>
+
+    <div id="forgotView" class="hidden">
+      <h3>Reset Password</h3>
+      <form id="forgotForm">
+        <input id="forgotEmail" type="email"
+          placeholder="Your email address" required>
+        <button type="submit">Send Reset Email</button>
+      </form>
+      <span class="link" id="backLogin">Back to Login</span>
+    </div>
+
+    <div id="resetView" class="hidden">
+      <h3>Choose a New Password</h3>
+      <form id="resetForm">
+        <input id="newPassword" type="password"
+          placeholder="New password" minlength="8" required>
+        <button type="submit">Update Password</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="dashboard" class="dashboard hidden">
+    <h2>Login Successful!</h2>
+    <p>Welcome to your dashboard.</p>
+    <p id="userEmail"></p>
+    <button id="logoutButton" class="secondary">Logout</button>
+  </div>
+
+  <div id="message" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+  // 1. ADD YOUR SUPABASE DETAILS HERE
+  const SUPABASE_URL = "YOUR_PROJECT_URL";
+  const SUPABASE_KEY = "YOUR_PUBLISHABLE_KEY";
+
+  // 2. CONNECT TO SUPABASE
+  const supabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+  const $ = (id) => document.getElementById(id);
+
+  function message(text) {
+    $("message").textContent = text;
+  }
+
+  function showView(view) {
+    ["loginView", "signupView", "forgotView", "resetView"]
+      .forEach(id => $(id).classList.add("hidden"));
+
+    $(view).classList.remove("hidden");
+    message("");
+  }
+
+  function setLoading(form, loading) {
+    const button = form.querySelector("button");
+    button.disabled = loading;
+  }
+
+  function showDashboard(user) {
+    $("authArea").classList.add("hidden");
+    $("dashboard").classList.remove("hidden");
+    $("userEmail").textContent = user.email || "";
+  }
+
+  function showLogin() {
+    $("dashboard").classList.add("hidden");
+    $("authArea").classList.remove("hidden");
+    showView("loginView");
+  }
+
+  // Switch between forms
+  $("showSignup").onclick = () => showView("signupView");
+  $("showLogin").onclick = () => showView("loginView");
+  $("backLogin").onclick = () => showView("loginView");
+  $("forgotLink").onclick = () => showView("forgotView");
+
+  // SIGN UP
+  $("signupForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setLoading(form, true);
+
+    const email = $("signupEmail").value.trim();
+    const password = $("signupPassword").value;
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: window.location.origin + window.location.pathname
+      }
+    });
+
+    setLoading(form, false);
+
+    if (error) {
+      message(error.message);
+      return;
+    }
+
+    message(
+      data.session
+        ? "Account created successfully!"
+        : "Account created! Please check your email to confirm it."
+    );
+
+    form.reset();
+  });
+
+  // LOGIN
+  $("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setLoading(form, true);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: $("loginEmail").value.trim(),
+      password: $("loginPassword").value
+    });
+
+    setLoading(form, false);
+
+    if (error) message(error.message);
+  });
+
+  // FORGOT PASSWORD
+  $("forgotForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setLoading(form, true);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      $("forgotEmail").value.trim(),
+      {
+        redirectTo: window.location.origin + window.location.pathname
+      }
+    );
+
+    setLoading(form, false);
+
+    message(error
+      ? error.message
+      : "If the account exists, a password reset email has been sent.");
+  });
+
+  // PASSWORD RECOVERY
+  $("resetForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    setLoading(form, true);
+
+    const { error } = await supabase.auth.updateUser({
+      password: $("newPassword").value
+    });
+
+    setLoading(form, false);
+
+    if (error) {
+      message(error.message);
+      return;
+    }
+
+    form.reset();
+    message("Password updated successfully!");
+    showLogin();
+  });
+
+  // LOGOUT
+  $("logoutButton").onclick = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) message(error.message);
+  };
+
+  // TRACK AUTHENTICATION STATE
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === "PASSWORD_RECOVERY") {
+      $("dashboard").classList.add("hidden");
+      $("authArea").classList.remove("hidden");
+      showView("resetView");
+      return;
+    }
+
+    if (session?.user) {
+      showDashboard(session.user);
+    } else {
+      showLogin();
+    }
+  });
+
+</script>
+
+</body>
+</html>
+
