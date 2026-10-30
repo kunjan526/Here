@@ -24,7 +24,6 @@
   --blue:#6b8cff;
   --green:#72e0b1;
 }
-
 * {box-sizing:border-box}
 html {scroll-behavior:smooth}
 body {
@@ -46,7 +45,7 @@ header {
   border-bottom:1px solid #203149;
 }
 .nav {
-  height:72px;
+  min-height:72px;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -59,7 +58,7 @@ header {
   text-decoration:none;
 }
 .brand span {color:var(--cyan)}
-.navlinks {display:flex;align-items:center;gap:20px}
+.navlinks {display:flex;align-items:center;gap:12px}
 .navlinks a {color:var(--muted);text-decoration:none;font-size:14px}
 .navlinks a:hover {color:white}
 
@@ -191,6 +190,7 @@ section {padding:32px 0 56px}
   color:var(--muted);
   font-size:12px;
   margin-top:14px;
+  gap:8px;
 }
 .actions {display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
 .textbtn {
@@ -248,7 +248,7 @@ textarea.field {min-height:100px;resize:vertical}
   padding:18px;
 }
 .modal {
-  width:min(520px,100%);
+  width:min(600px,100%);
   max-height:90vh;
   overflow:auto;
   background:#101e31;
@@ -263,22 +263,116 @@ textarea.field {min-height:100px;resize:vertical}
 .comment small {color:var(--muted)}
 footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size:13px}
 
+.profile-layout {
+  display:grid;
+  grid-template-columns:220px 1fr;
+  gap:22px;
+  align-items:start;
+}
+.profile-card {
+  text-align:center;
+  background:#0b192a;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:20px;
+}
+.avatar {
+  width:116px;
+  height:116px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid var(--cyan);
+  background:#1b2c43;
+}
+.profile-name {font:700 25px "Space Grotesk";margin:12px 0 5px}
+.profile-handle {color:var(--cyan);font-size:13px}
+.profile-bio {color:var(--muted);font-size:14px;line-height:1.6}
+.profile-stats {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:18px 0;
+}
+.profile-stat {
+  background:#0b192a;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:14px 8px;
+  text-align:center;
+}
+.profile-stat strong {
+  display:block;
+  font:700 23px "Space Grotesk";
+  color:var(--cyan);
+}
+.profile-stat span {font-size:11px;color:var(--muted)}
+.skill-list,.badge-list {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:12px 0;
+}
+.skill {
+  padding:7px 11px;
+  border-radius:20px;
+  background:#123343;
+  border:1px solid #24516a;
+  color:#8feafa;
+  font-size:12px;
+}
+.achievement {
+  padding:10px 13px;
+  border:1px solid #40516a;
+  background:#17263a;
+  border-radius:11px;
+  font-size:12px;
+  color:#e5efff;
+}
+.profile-links {display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.profile-links a {color:var(--cyan);font-size:13px;text-decoration:none}
+.profile-projects {display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.mini-project {
+  background:#0b192a;
+  border:1px solid var(--line);
+  padding:13px;
+  border-radius:12px;
+}
+.mini-project strong {display:block;margin-bottom:5px}
+.mini-project span {font-size:12px;color:var(--muted)}
+.profile-section-title {margin:24px 0 10px;font:600 18px "Space Grotesk"}
+.avatar-preview {
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:14px;
+}
+.avatar-preview img {
+  width:64px;height:64px;border-radius:50%;
+  object-fit:cover;background:#1b2c43;
+}
+
 @media(max-width:800px) {
   .hero {grid-template-columns:1fr;padding-top:50px}
   .hero-card {max-width:560px}
   .grid {grid-template-columns:repeat(2,1fr)}
+  .profile-layout {grid-template-columns:1fr}
+  .profile-card {max-width:100%}
 }
 @media(max-width:560px) {
   .wrap {width:min(100% - 26px,1120px)}
-  .nav {height:64px}
-  .navlinks {gap:10px}
+  .nav {min-height:64px}
+  .navlinks {gap:6px}
   .navlinks a {display:none}
+  .navlinks .btn {padding:8px 9px;font-size:11px}
   .hero {padding-top:38px}
   h1 {letter-spacing:-2px}
   .grid {grid-template-columns:1fr}
   .formgrid {grid-template-columns:1fr}
   .formgrid .full {grid-column:auto}
   .sectionhead {align-items:start;flex-direction:column}
+  .profile-stats {gap:6px}
+  .profile-stat {padding:10px 5px}
+  .profile-projects {grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -291,6 +385,7 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
     <nav class="navlinks">
       <a href="#projects">Explore</a>
       <a href="#about">About</a>
+      <button class="btn small secondary hidden" id="profileButton">My Profile</button>
       <button class="btn small" id="authButton">Login / Join</button>
     </nav>
   </div>
@@ -351,6 +446,107 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
     </div>
   </section>
 
+  <!-- MAKER PROFILE SECTION -->
+  <section id="profileSection" class="wrap hidden">
+    <div class="sectionhead">
+      <div>
+        <div class="eyebrow">NOTHINK maker community</div>
+        <h2>Maker Profile</h2>
+      </div>
+      <button class="btn secondary small" id="backToProjects">← Back to projects</button>
+    </div>
+
+    <div class="profile-layout">
+      <div class="profile-card">
+        <img id="viewAvatar" class="avatar" src="" alt="Maker profile photo">
+        <div class="profile-name" id="viewUsername">Maker</div>
+        <div class="profile-handle" id="viewHandle">@maker</div>
+        <p class="profile-bio" id="viewBio">No bio added yet.</p>
+        <div class="profile-links" id="viewLinks"></div>
+        <button class="btn small" id="editProfileButton">Edit my profile</button>
+      </div>
+
+      <div>
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <strong id="profileProjectCount">0</strong>
+            <span>Projects</span>
+          </div>
+          <div class="profile-stat">
+            <strong id="profileLikesCount">0</strong>
+            <span>Likes received</span>
+          </div>
+          <div class="profile-stat">
+            <strong id="profileSkillCount">0</strong>
+            <span>Skills</span>
+          </div>
+        </div>
+
+        <h3 class="profile-section-title">Skills & interests</h3>
+        <div class="skill-list" id="viewSkills">
+          <span class="skill">Add your skills</span>
+        </div>
+
+        <h3 class="profile-section-title">Achievements</h3>
+        <div class="badge-list" id="viewBadges"></div>
+
+        <h3 class="profile-section-title">Published projects</h3>
+        <div class="profile-projects" id="profileProjects"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDIT PROFILE SECTION -->
+  <section id="editProfileSection" class="wrap hidden">
+    <div class="sectionhead">
+      <div>
+        <div class="eyebrow">Your maker identity</div>
+        <h2>Edit your profile</h2>
+      </div>
+      <button class="btn secondary small" id="cancelProfileEdit">Cancel</button>
+    </div>
+
+    <form id="profileForm" class="panel">
+      <div class="avatar-preview">
+        <img id="avatarPreview" src="" alt="Profile photo preview">
+        <div>
+          <label for="profileAvatar">Profile photo (max 2 MB)</label>
+          <input class="field" id="profileAvatar" type="file" accept="image/png,image/jpeg,image/webp">
+        </div>
+      </div>
+
+      <div class="formgrid">
+        <div class="formgroup">
+          <label for="profileUsername">Username *</label>
+          <input class="field" id="profileUsername" maxlength="30" required placeholder="e.g. kunjan_maker">
+        </div>
+
+        <div class="formgroup">
+          <label for="profileSkills">Skills</label>
+          <input class="field" id="profileSkills" maxlength="300" placeholder="Arduino, ESP32, Python, Robotics">
+        </div>
+
+        <div class="formgroup full">
+          <label for="profileBio">About me</label>
+          <textarea class="field" id="profileBio" maxlength="500" placeholder="Tell the community what you enjoy building and learning..."></textarea>
+        </div>
+
+        <div class="formgroup">
+          <label for="profileGithub">GitHub profile link</label>
+          <input class="field" id="profileGithub" type="url" placeholder="https://github.com/username">
+        </div>
+
+        <div class="formgroup">
+          <label for="profileWebsite">Portfolio / website link</label>
+          <input class="field" id="profileWebsite" type="url" placeholder="https://example.com">
+        </div>
+      </div>
+
+      <button class="btn" type="submit" id="saveProfileButton">Save profile</button>
+      <div class="status" id="profileStatus" role="status"></div>
+    </form>
+  </section>
+
   <section id="shareSection" class="wrap hidden">
     <div class="sectionhead">
       <div>
@@ -361,7 +557,6 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
 
     <form id="projectForm" class="panel">
       <div class="formgrid">
-
         <div class="formgroup">
           <label for="projectTitle">Project title *</label>
           <input class="field" id="projectTitle" maxlength="90" required placeholder="e.g. Smart plant watering system">
@@ -400,16 +595,13 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
         <div class="formgroup">
           <label for="projectFile">Project file (optional, max 5 MB)</label>
           <input class="field" id="projectFile" type="file" accept=".ino,.c,.cpp,.h,.py,.js,.json,.txt,.pdf,.zip,.png,.jpg,.jpeg,.webp">
-          <small style="color:var(--muted)">
-            Arduino, ESP32 code, PDF, ZIP or circuit diagram.
-          </small>
+          <small style="color:var(--muted)">Arduino, ESP32 code, PDF, ZIP or circuit diagram.</small>
         </div>
 
         <div class="formgroup full">
           <label for="projectCode">Code link (optional)</label>
           <input class="field" id="projectCode" type="url" placeholder="https://github.com/...">
         </div>
-
       </div>
 
       <button class="btn" type="submit">Publish project</button>
@@ -450,17 +642,14 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
         <label for="authEmail">Email</label>
         <input class="field" id="authEmail" type="email" required autocomplete="email">
       </div>
-
       <div class="formgroup">
         <label for="authPassword">Password</label>
         <input class="field" id="authPassword" type="password" required minlength="6" autocomplete="current-password">
       </div>
-
       <button class="btn" id="authSubmit" type="submit">Create account</button>
     </form>
 
     <div class="status" id="authStatus" role="status"></div>
-
     <div class="authswitch">
       <span id="authSwitchText">Already have an account?</span>
       <button class="linkbtn" id="authSwitch" type="button">Login</button>
@@ -474,9 +663,7 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
       <h2>Project discussion</h2>
       <button class="close" id="closeComments">×</button>
     </div>
-
     <div id="commentList"></div>
-
     <form id="commentForm">
       <div class="formgroup">
         <label for="commentText">Add a helpful comment</label>
@@ -500,8 +687,12 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
   let authMode = "signup";
   let activeCommentProject = null;
   let projects = [];
+  let currentProfile = null;
+  let viewingProfileId = null;
 
   const MAX_FILE_SIZE = 5 * 1024 * 1024;
+  const MAX_AVATAR_SIZE = 2 * 1024 * 1024;
+  const DEFAULT_AVATAR = "https://placehold.co/300x300/14243a/42d9ee?text=Maker";
 
   const allowedExtensions = [
     "ino","c","cpp","h","py","js","json","txt",
@@ -523,6 +714,15 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
     "'":"&#39;"
   }[c]));
 
+  function safeLink(value) {
+    try {
+      const url = new URL(value);
+      return ["https:","http:"].includes(url.protocol) ? url.href : "";
+    } catch {
+      return "";
+    }
+  }
+
   function showAuth(mode="signup") {
     authMode = mode;
     $("authTitle").textContent = mode === "signup" ? "Join NOTHINK" : "Welcome back";
@@ -535,6 +735,7 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
 
   function updateAuthUI() {
     $("authButton").textContent = currentUser ? "Logout" : "Login / Join";
+    $("profileButton").classList.toggle("hidden",!currentUser);
     $("shareSection").classList.toggle("hidden",!currentUser);
     $("heroShare").textContent = currentUser ? "Share your project ↗" : "Join to share ↗";
   }
@@ -543,6 +744,7 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
     if (currentUser) {
       const {error} = await client.auth.signOut();
       if (error) alert(error.message);
+      closeProfileSections();
     } else {
       showAuth("signup");
     }
@@ -554,6 +756,10 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
     } else {
       $("shareSection").scrollIntoView({behavior:"smooth"});
     }
+  });
+
+  $("profileButton").addEventListener("click",() => {
+    if (currentUser) showProfile(currentUser.id);
   });
 
   $("closeAuth").addEventListener("click",() => $("authModal").classList.add("hidden"));
@@ -624,7 +830,6 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
           alt="Project image"
           onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80'"
         >
-
         <div class="projectbody">
           <span class="tag">${safe(p.category)}</span>
           <h3>${safe(p.title)}</h3>
@@ -639,16 +844,17 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
           ` : ""}
 
           <div class="meta">
-            <span>by ${safe(p.user_id === currentUser?.id ? (currentUser.email || "you") : "NOTHINK maker")}</span>
+            <span>NOTHINK maker</span>
             <span>${new Date(p.created_at).toLocaleDateString()}</span>
           </div>
 
           <div class="actions">
             <button class="textbtn" data-like="${p.id}">♡ Like</button>
             <button class="textbtn" data-comment="${p.id}">Discuss</button>
+            <button class="textbtn" data-maker="${safe(p.user_id)}">Maker profile</button>
 
             ${p.code_url ? `
-              <a class="textbtn" href="${safe(p.code_url)}" target="_blank" rel="noopener">View code ↗</a>
+              <a class="textbtn" href="${safe(safeLink(p.code_url))}" target="_blank" rel="noopener">View code ↗</a>
             ` : ""}
 
             ${p.file_path ? `
@@ -670,15 +876,17 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
     document.querySelectorAll("[data-download]").forEach(button => {
       button.addEventListener("click",() => downloadProjectFile(button.dataset.download));
     });
+
+    document.querySelectorAll("[data-maker]").forEach(button => {
+      button.addEventListener("click",() => showProfile(button.dataset.maker));
+    });
   }
 
   $("searchInput").addEventListener("input",renderProjects);
   $("categoryFilter").addEventListener("change",renderProjects);
 
   async function downloadProjectFile(projectId) {
-    if (!currentUser) {
-      return showAuth("login");
-    }
+    if (!currentUser) return showAuth("login");
 
     const project = projects.find(p => String(p.id) === String(projectId));
 
@@ -700,7 +908,6 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
     link.download = project.file_name || "project-file";
     link.target = "_blank";
     link.rel = "noopener";
-
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -709,9 +916,7 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
   $("projectForm").addEventListener("submit",async event => {
     event.preventDefault();
 
-    if (!currentUser) {
-      return showAuth("login");
-    }
+    if (!currentUser) return showAuth("login");
 
     setStatus("projectStatus","Publishing project...");
 
@@ -721,7 +926,6 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
     const imageFile = $("projectImage").files[0];
     const projectFile = $("projectFile").files[0];
 
-    // Upload optional project image.
     if (imageFile) {
       if (imageFile.size > MAX_FILE_SIZE) {
         return setStatus("projectStatus","Image must be 5 MB or smaller.",true);
@@ -742,14 +946,10 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
         return setStatus("projectStatus","Image upload failed: " + uploadError.message,true);
       }
 
-      const {data} = client.storage
-        .from("project-images")
-        .getPublicUrl(path);
-
+      const {data} = client.storage.from("project-images").getPublicUrl(path);
       imageUrl = data.publicUrl;
     }
 
-    // Upload optional project attachment to private bucket.
     if (projectFile) {
       if (projectFile.size > MAX_FILE_SIZE) {
         return setStatus("projectStatus","Project file must be 5 MB or smaller.",true);
@@ -788,7 +988,6 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
       };
     }
 
-    // Save project information in database.
     const record = {
       user_id:currentUser.id,
       title:$("projectTitle").value.trim(),
@@ -806,25 +1005,19 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
 
     if (error) {
       if (uploadedProjectFile) {
-        await client.storage
-          .from("project-files")
-          .remove([uploadedProjectFile.path]);
+        await client.storage.from("project-files").remove([uploadedProjectFile.path]);
       }
-
       return setStatus("projectStatus",error.message,true);
     }
 
     $("projectForm").reset();
     setStatus("projectStatus","Your project is now published!");
-
     await loadProjects();
     $("projects").scrollIntoView({behavior:"smooth"});
   });
 
   async function likeProject(projectId) {
-    if (!currentUser) {
-      return showAuth("login");
-    }
+    if (!currentUser) return showAuth("login");
 
     const {error} = await client
       .from("likes")
@@ -833,10 +1026,7 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
     if (error && error.code === "23505") {
       return alert("You have already liked this project.");
     }
-
-    if (error) {
-      return alert(error.message);
-    }
+    if (error) return alert(error.message);
 
     alert("Thanks for supporting this project!");
   }
@@ -864,9 +1054,7 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
         <small>${new Date(c.created_at).toLocaleString()}</small>
       </div>
     `).join("") || `
-      <p style="color:var(--muted);font-size:13px">
-        No comments yet. Start the discussion.
-      </p>
+      <p style="color:var(--muted);font-size:13px">No comments yet. Start the discussion.</p>
     `;
 
     $("commentForm").classList.toggle("hidden",!currentUser);
@@ -886,12 +1074,9 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
   $("commentForm").addEventListener("submit",async event => {
     event.preventDefault();
 
-    if (!currentUser) {
-      return showAuth("login");
-    }
+    if (!currentUser) return showAuth("login");
 
     const body = $("commentText").value.trim();
-
     if (!body) return;
 
     const {error} = await client
@@ -902,13 +1087,310 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
         body
       });
 
-    if (error) {
-      return setStatus("commentStatus",error.message,true);
-    }
+    if (error) return setStatus("commentStatus",error.message,true);
 
     $("commentText").value = "";
     await openComments(activeCommentProject);
   });
+
+  // ---------------- MAKER PROFILE FEATURES ----------------
+
+  function closeProfileSections() {
+    $("profileSection").classList.add("hidden");
+    $("editProfileSection").classList.add("hidden");
+  }
+
+  function showProjectsSection() {
+    closeProfileSections();
+    $("projects").scrollIntoView({behavior:"smooth"});
+  }
+
+  $("backToProjects").addEventListener("click",showProjectsSection);
+
+  $("cancelProfileEdit").addEventListener("click",() => {
+    if (viewingProfileId) showProfile(viewingProfileId);
+  });
+
+  $("editProfileButton").addEventListener("click",() => {
+    if (currentUser && viewingProfileId === currentUser.id) {
+      openProfileEditor();
+    }
+  });
+
+  async function ensureProfile(user) {
+    if (!user) return null;
+
+    const {data,error} = await client
+      .from("profiles")
+      .select("*")
+      .eq("id",user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Profile lookup error:",error);
+      return null;
+    }
+
+    if (data) return data;
+
+    const baseName = (user.email || "maker")
+      .split("@")[0]
+      .replace(/[^a-zA-Z0-9_]/g,"_")
+      .slice(0,22) || "maker";
+
+    const newProfile = {
+      id:user.id,
+      username:baseName,
+      bio:"",
+      avatar_url:"",
+      skills:[],
+      github_url:"",
+      website_url:""
+    };
+
+    const {data:created,error:createError} = await client
+      .from("profiles")
+      .insert(newProfile)
+      .select()
+      .single();
+
+    if (createError) {
+      console.error("Could not create profile:",createError);
+      return null;
+    }
+
+    return created;
+  }
+
+  async function showProfile(userId) {
+    if (!userId) return;
+
+    closeProfileSections();
+    $("profileSection").classList.remove("hidden");
+    $("profileSection").scrollIntoView({behavior:"smooth"});
+    $("viewUsername").textContent = "Loading profile...";
+    $("viewBio").textContent = "";
+    $("viewSkills").innerHTML = "";
+    $("viewBadges").innerHTML = "";
+    $("profileProjects").innerHTML = `<div class="empty">Loading projects...</div>`;
+    $("viewLinks").innerHTML = "";
+
+    viewingProfileId = userId;
+
+    let profile = null;
+
+    if (currentUser && currentUser.id === userId) {
+      profile = await ensureProfile(currentUser);
+    } else {
+      const {data,error} = await client
+        .from("profiles")
+        .select("*")
+        .eq("id",userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error(error);
+        $("viewUsername").textContent = "Could not load profile";
+        $("profileProjects").innerHTML = `<div class="empty">Please try again later.</div>`;
+        return;
+      }
+      profile = data;
+    }
+
+    if (!profile) {
+      $("viewUsername").textContent = "Maker profile unavailable";
+      $("viewBio").textContent = "This maker has not created a profile yet.";
+      $("viewAvatar").src = DEFAULT_AVATAR;
+      $("editProfileButton").classList.add("hidden");
+      $("profileProjects").innerHTML = `<div class="empty">No profile information is available.</div>`;
+      return;
+    }
+
+    currentProfile = profile;
+
+    const username = profile.username || "NOTHINK maker";
+    $("viewUsername").textContent = username;
+    $("viewHandle").textContent = "@" + username;
+    $("viewBio").textContent = profile.bio || "This maker has not added a bio yet.";
+    $("viewAvatar").src = profile.avatar_url || DEFAULT_AVATAR;
+    $("editProfileButton").classList.toggle("hidden",!(currentUser && currentUser.id === userId));
+
+    const github = safeLink(profile.github_url || "");
+    const website = safeLink(profile.website_url || "");
+
+    $("viewLinks").innerHTML = `
+      ${github ? `<a href="${safe(github)}" target="_blank" rel="noopener">GitHub ↗</a>` : ""}
+      ${website ? `<a href="${safe(website)}" target="_blank" rel="noopener">Portfolio ↗</a>` : ""}
+    `;
+
+    const skills = Array.isArray(profile.skills) ? profile.skills : [];
+    $("viewSkills").innerHTML = skills.length
+      ? skills.map(skill => `<span class="skill">${safe(skill)}</span>`).join("")
+      : `<span class="skill">No skills added yet</span>`;
+
+    const makerProjects = projects.filter(p => p.user_id === userId);
+    const projectIds = makerProjects.map(p => p.id);
+
+    let likesCount = 0;
+
+    if (projectIds.length) {
+      const {count,error:likesError} = await client
+        .from("likes")
+        .select("project_id",{count:"exact",head:true})
+        .in("project_id",projectIds);
+
+      if (!likesError) likesCount = count || 0;
+    }
+
+    $("profileProjectCount").textContent = makerProjects.length;
+    $("profileLikesCount").textContent = likesCount;
+    $("profileSkillCount").textContent = skills.length;
+
+    const badges = [];
+
+    if (makerProjects.length >= 1) badges.push("🚀 First Project");
+    if (makerProjects.length >= 5) badges.push("🛠️ Active Builder");
+    if (makerProjects.length >= 10) badges.push("⭐ Project Explorer");
+    if (likesCount >= 10) badges.push("💙 Community Favourite");
+    if (skills.length >= 3) badges.push("🧠 Skilled Maker");
+
+    $("viewBadges").innerHTML = badges.length
+      ? badges.map(b => `<span class="achievement">${safe(b)}</span>`).join("")
+      : `<span class="achievement">🌱 Your first achievement is waiting</span>`;
+
+    $("profileProjects").innerHTML = makerProjects.length
+      ? makerProjects.map(p => `
+          <div class="mini-project">
+            <strong>${safe(p.title)}</strong>
+            <span>${safe(p.category)} · ${new Date(p.created_at).toLocaleDateString()}</span>
+          </div>
+        `).join("")
+      : `<div class="empty">This maker has not published any projects yet.</div>`;
+  }
+
+  async function openProfileEditor() {
+    if (!currentUser) return showAuth("login");
+
+    const profile = await ensureProfile(currentUser);
+
+    if (!profile) {
+      alert("Could not load your profile. Please check your Supabase profiles permissions.");
+      return;
+    }
+
+    currentProfile = profile;
+    viewingProfileId = currentUser.id;
+
+    $("profileUsername").value = profile.username || "";
+    $("profileBio").value = profile.bio || "";
+    $("profileSkills").value = Array.isArray(profile.skills) ? profile.skills.join(", ") : "";
+    $("profileGithub").value = profile.github_url || "";
+    $("profileWebsite").value = profile.website_url || "";
+    $("avatarPreview").src = profile.avatar_url || DEFAULT_AVATAR;
+    $("profileAvatar").value = "";
+    setStatus("profileStatus","");
+
+    $("profileSection").classList.add("hidden");
+    $("editProfileSection").classList.remove("hidden");
+    $("editProfileSection").scrollIntoView({behavior:"smooth"});
+  }
+
+  $("profileAvatar").addEventListener("change",() => {
+    const file = $("profileAvatar").files[0];
+    if (!file) return;
+
+    if (file.size > MAX_AVATAR_SIZE) {
+      $("profileAvatar").value = "";
+      return setStatus("profileStatus","Profile photo must be 2 MB or smaller.",true);
+    }
+
+    if (!["image/png","image/jpeg","image/webp"].includes(file.type)) {
+      $("profileAvatar").value = "";
+      return setStatus("profileStatus","Choose a PNG, JPEG or WEBP image.",true);
+    }
+
+    $("avatarPreview").src = URL.createObjectURL(file);
+  });
+
+  $("profileForm").addEventListener("submit",async event => {
+    event.preventDefault();
+
+    if (!currentUser) return showAuth("login");
+
+    const username = $("profileUsername").value.trim();
+
+    if (!/^[a-zA-Z0-9_]{3,30}$/.test(username)) {
+      return setStatus("profileStatus","Username must be 3–30 characters and use only letters, numbers or underscores.",true);
+    }
+
+    setStatus("profileStatus","Saving your profile...");
+
+    let avatarUrl = currentProfile?.avatar_url || "";
+    const avatarFile = $("profileAvatar").files[0];
+
+    if (avatarFile) {
+      if (avatarFile.size > MAX_AVATAR_SIZE) {
+        return setStatus("profileStatus","Profile photo must be 2 MB or smaller.",true);
+      }
+
+      const extension = avatarFile.name.split(".").pop().toLowerCase();
+      const filePath = `${currentUser.id}/${crypto.randomUUID()}.${extension}`;
+
+      const {error:uploadError} = await client
+        .storage
+        .from("profile-photos")
+        .upload(filePath,avatarFile,{
+          upsert:false,
+          contentType:avatarFile.type
+        });
+
+      if (uploadError) {
+        return setStatus("profileStatus","Photo upload failed: " + uploadError.message,true);
+      }
+
+      const {data} = client.storage
+        .from("profile-photos")
+        .getPublicUrl(filePath);
+
+      avatarUrl = data.publicUrl;
+    }
+
+    const skills = $("profileSkills").value
+      .split(",")
+      .map(skill => skill.trim())
+      .filter(Boolean)
+      .slice(0,20);
+
+    const profileData = {
+      id:currentUser.id,
+      username,
+      bio:$("profileBio").value.trim(),
+      avatar_url:avatarUrl,
+      skills,
+      github_url:$("profileGithub").value.trim(),
+      website_url:$("profileWebsite").value.trim()
+    };
+
+    const {data,error} = await client
+      .from("profiles")
+      .upsert(profileData,{onConflict:"id"})
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === "23505") {
+        return setStatus("profileStatus","That username is already taken. Please choose another.",true);
+      }
+      return setStatus("profileStatus","Could not save profile: " + error.message,true);
+    }
+
+    currentProfile = data;
+    setStatus("profileStatus","Profile saved successfully!");
+
+    await showProfile(currentUser.id);
+  });
+
+  // ---------------- AUTHENTICATION ----------------
 
   client.auth.onAuthStateChange((_event,session) => {
     currentUser = session?.user || null;
@@ -916,10 +1398,14 @@ footer {border-top:1px solid #203149;padding:28px 0;color:var(--muted);font-size
     renderProjects();
   });
 
-  client.auth.getSession().then(({data}) => {
+  client.auth.getSession().then(async ({data}) => {
     currentUser = data.session?.user || null;
     updateAuthUI();
     renderProjects();
+
+    if (currentUser) {
+      await ensureProfile(currentUser);
+    }
   });
 
   loadProjects();
