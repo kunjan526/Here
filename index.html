@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Website</title>
+  <title>MyLoginWebsite</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -57,9 +57,7 @@
     button:hover { background: #1d4ed8; }
     button:disabled { opacity: .6; cursor: wait; }
 
-    .secondary {
-      background: #475569;
-    }
+    .secondary { background: #475569; }
 
     .link {
       display: block;
@@ -90,8 +88,10 @@
   <p>Welcome to MyLoginWebsite</p>
 
   <div id="authArea">
+
     <div id="loginView">
       <h3>Login</h3>
+
       <form id="loginForm">
         <input id="loginEmail" type="email"
           placeholder="Email address" autocomplete="email" required>
@@ -108,6 +108,7 @@
 
     <div id="signupView" class="hidden">
       <h3>Create Account</h3>
+
       <form id="signupForm">
         <input id="signupEmail" type="email"
           placeholder="Email address" autocomplete="email" required>
@@ -119,27 +120,35 @@
         <button type="submit">Sign Up</button>
       </form>
 
-      <span class="link" id="showLogin">Already have an account? Login</span>
+      <span class="link" id="showLogin">
+        Already have an account? Login
+      </span>
     </div>
 
     <div id="forgotView" class="hidden">
       <h3>Reset Password</h3>
+
       <form id="forgotForm">
         <input id="forgotEmail" type="email"
           placeholder="Your email address" required>
+
         <button type="submit">Send Reset Email</button>
       </form>
+
       <span class="link" id="backLogin">Back to Login</span>
     </div>
 
     <div id="resetView" class="hidden">
       <h3>Choose a New Password</h3>
+
       <form id="resetForm">
         <input id="newPassword" type="password"
           placeholder="New password" minlength="8" required>
+
         <button type="submit">Update Password</button>
       </form>
     </div>
+
   </div>
 
   <div id="dashboard" class="dashboard hidden">
@@ -153,12 +162,12 @@
 </div>
 
 <script>
-  // 1. ADD YOUR SUPABASE DETAILS HERE
+  // SUPABASE CONFIGURATION
   const SUPABASE_URL = "https://mmkbhpxcmhzmjabffdlj.supabase.co";
   const SUPABASE_KEY = "sb_publishable_nKtk3UwdMkLP6Go_zmxNzA_hQWcakJq";
 
-  // 2. CONNECT TO SUPABASE
-  const supabase = window.supabase.createClient(
+  // CREATE SUPABASE CLIENT
+  const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
   );
@@ -178,8 +187,7 @@
   }
 
   function setLoading(form, loading) {
-    const button = form.querySelector("button");
-    button.disabled = loading;
+    form.querySelector("button").disabled = loading;
   }
 
   function showDashboard(user) {
@@ -194,7 +202,7 @@
     showView("loginView");
   }
 
-  // Switch between forms
+  // NAVIGATION
   $("showSignup").onclick = () => showView("signupView");
   $("showLogin").onclick = () => showView("loginView");
   $("backLogin").onclick = () => showView("loginView");
@@ -203,102 +211,121 @@
   // SIGN UP
   $("signupForm").addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const form = e.currentTarget;
     setLoading(form, true);
 
-    const email = $("signupEmail").value.trim();
-    const password = $("signupPassword").value;
+    try {
+      const { data, error } = await supabaseClient.auth.signUp({
+        email: $("signupEmail").value.trim(),
+        password: $("signupPassword").value,
+        options: {
+          emailRedirectTo:
+            window.location.origin + window.location.pathname
+        }
+      });
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: window.location.origin + window.location.pathname
-      }
-    });
+      if (error) throw error;
 
-    setLoading(form, false);
+      message(
+        data.session
+          ? "Account created successfully!"
+          : "Account created! Please check your email to confirm it."
+      );
 
-    if (error) {
+      form.reset();
+
+    } catch (error) {
       message(error.message);
-      return;
+    } finally {
+      setLoading(form, false);
     }
-
-    message(
-      data.session
-        ? "Account created successfully!"
-        : "Account created! Please check your email to confirm it."
-    );
-
-    form.reset();
   });
 
   // LOGIN
   $("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const form = e.currentTarget;
     setLoading(form, true);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: $("loginEmail").value.trim(),
-      password: $("loginPassword").value
-    });
+    try {
+      const { error } = await supabaseClient.auth.signInWithPassword({
+        email: $("loginEmail").value.trim(),
+        password: $("loginPassword").value
+      });
 
-    setLoading(form, false);
+      if (error) throw error;
 
-    if (error) message(error.message);
+    } catch (error) {
+      message(error.message);
+    } finally {
+      setLoading(form, false);
+    }
   });
 
   // FORGOT PASSWORD
   $("forgotForm").addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const form = e.currentTarget;
     setLoading(form, true);
 
-    const { error } = await supabase.auth.resetPasswordForEmail(
-      $("forgotEmail").value.trim(),
-      {
-        redirectTo: window.location.origin + window.location.pathname
-      }
-    );
+    try {
+      const { error } =
+        await supabaseClient.auth.resetPasswordForEmail(
+          $("forgotEmail").value.trim(),
+          {
+            redirectTo:
+              window.location.origin + window.location.pathname
+          }
+        );
 
-    setLoading(form, false);
+      if (error) throw error;
 
-    message(error
-      ? error.message
-      : "If the account exists, a password reset email has been sent.");
+      message("If the account exists, a password reset email has been sent.");
+
+    } catch (error) {
+      message(error.message);
+    } finally {
+      setLoading(form, false);
+    }
   });
 
-  // PASSWORD RECOVERY
+  // UPDATE PASSWORD
   $("resetForm").addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const form = e.currentTarget;
     setLoading(form, true);
 
-    const { error } = await supabase.auth.updateUser({
-      password: $("newPassword").value
-    });
+    try {
+      const { error } = await supabaseClient.auth.updateUser({
+        password: $("newPassword").value
+      });
 
-    setLoading(form, false);
+      if (error) throw error;
 
-    if (error) {
+      form.reset();
+      message("Password updated successfully!");
+      showLogin();
+
+    } catch (error) {
       message(error.message);
-      return;
+    } finally {
+      setLoading(form, false);
     }
-
-    form.reset();
-    message("Password updated successfully!");
-    showLogin();
   });
 
   // LOGOUT
   $("logoutButton").onclick = async () => {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await supabaseClient.auth.signOut();
+
     if (error) message(error.message);
   };
 
-  // TRACK AUTHENTICATION STATE
-  supabase.auth.onAuthStateChange((event, session) => {
+  // AUTHENTICATION STATE
+  supabaseClient.auth.onAuthStateChange((event, session) => {
     if (event === "PASSWORD_RECOVERY") {
       $("dashboard").classList.add("hidden");
       $("authArea").classList.remove("hidden");
@@ -317,4 +344,3 @@
 
 </body>
 </html>
-
